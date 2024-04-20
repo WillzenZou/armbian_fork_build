@@ -1,5 +1,6 @@
 anacron
 apport-gtk
+apt-xapian-index
 arandr
 blueman
 bluez
@@ -10,8 +11,6 @@ brltty-x11
 caffeine
 cifs-utils
 compton
-conky
-conky-all
 cups
 cups-bsd
 cups-client
@@ -40,6 +39,7 @@ fonts-nanum
 fonts-opensymbol
 fonts-stix
 fonts-symbola
+fonts-ubuntu
 fonts-ubuntu-console
 foomatic-db-compressed-ppds
 gdebi
@@ -61,6 +61,7 @@ i3
 i3lock
 i3status
 i3-wm
+suckless-tools
 indicator-printers
 inputattach
 kerneloops
@@ -153,6 +154,7 @@ xorg-docs-core
 xscreensaver
 xserver-xorg
 xserver-xorg-video-fbdev
+xauth
 xtitle
 xttitle
 xwallpaper

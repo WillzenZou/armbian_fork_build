@@ -1,9 +1,19 @@
+From 4af18a7595fc0bf36b91867217ac1bfbb7e5503f Mon Sep 17 00:00:00 2001
+From: Paolo Sabatino <paolo.sabatino@gmail.com>
+Date: Sun, 21 May 2023 17:35:55 +0200
+Subject: [PATCH] rk3399: add Orange Pi 4 LTS device tree
+
+---
+ .../dts/rockchip/rk3399-orangepi-4-lts.dts    | 1244 +++++++++++++++++
+ 1 file changed, 1244 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/rockchip/rk3399-orangepi-4-lts.dts
+
 diff --git a/arch/arm64/boot/dts/rockchip/rk3399-orangepi-4-lts.dts b/arch/arm64/boot/dts/rockchip/rk3399-orangepi-4-lts.dts
 new file mode 100644
-index 00000000000..e0490aaa7ba
+index 000000000000..6d6bee12a453
 --- /dev/null
 +++ b/arch/arm64/boot/dts/rockchip/rk3399-orangepi-4-lts.dts
-@@ -0,0 +1,1258 @@
+@@ -0,0 +1,1304 @@
 +/*
 + * SPDX-License-Identifier: (GPL-2.0+ or MIT)
 + * Copyright (c) 2017 Fuzhou Rockchip Electronics Co., Ltd.
@@ -123,7 +133,7 @@ index 00000000000..e0490aaa7ba
 +		enable-active-high;
 +		gpio = <&gpio0 RK_PA1 GPIO_ACTIVE_HIGH>;
 +		pinctrl-names = "default";
-+		pinctrl-0 = <&sdmmc0_pwr_h>;
++		pinctrl-0 = <&sdmmc_pwr>;
 +		regulator-name = "vcc3v0_sd";
 +		regulator-always-on;
 +		regulator-min-microvolt = <3000000>;
@@ -200,21 +210,6 @@ index 00000000000..e0490aaa7ba
 +		};
 +
 +	};
-+
-+	/*
-+	dw_hdmi_audio: dw-hdmi-audio {
-+		status = "disable";
-+		compatible = "rockchip,dw-hdmi-audio";
-+		#sound-dai-cells = <0>;
-+	};
-+
-+        hdmi_dp_sound: hdmi-dp-sound {
-+                status = "okay";
-+                compatible = "rockchip,rk3399-hdmi-dp";
-+                rockchip,cpu = <&i2s2>;
-+                rockchip,codec = <&hdmi>, <&cdn_dp>;
-+        };
-+        */
 +
 +	hdmi-sound {
 +		compatible = "simple-audio-card";
@@ -383,6 +378,26 @@ index 00000000000..e0490aaa7ba
 +		status = "okay";
 +	};
 +
++	dmc_opp_table: dmc_opp_table {
++		compatible = "operating-points-v2";
++
++		opp00 {
++			opp-hz = /bits/ 64 <328000000>;
++			opp-microvolt = <900000>;
++		};
++
++		opp01 {
++			opp-hz = /bits/ 64 <416000000>;
++			opp-microvolt = <900000>;
++		};
++
++		opp02 {
++			opp-hz = /bits/ 64 <666000000>;
++			opp-microvolt = <900000>;
++		};
++
++	};
++
 +};
 +
 +&cpu_l0 {
@@ -442,37 +457,11 @@ index 00000000000..e0490aaa7ba
 +		status = "okay";
 +	};
 +};
-+/*
-+&spi1 {
-+    status = "okay";
-+    max-freq = <48000000>;
-+    spidev@00 {
-+        compatible = "linux,spidev";
-+        reg = <0x00>;
-+        spi-max-frequency = <48000000>;
-+    };
-+};
-+*/
 +
 +&uart0 {
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&uart0_xfer &uart0_cts &uart0_rts>;
 +	status = "okay";
-+
-+	/*
-+	bluetooth {
-+		compatible = "brcm,bcm4345c5";
-+		clocks = <&rk808 1>;
-+		clock-names = "lpo";
-+		device-wakeup-gpios = <&gpio2 RK_PD2 GPIO_ACTIVE_HIGH>;
-+		host-wakeup-gpios = <&gpio0 RK_PA4 GPIO_ACTIVE_HIGH>;
-+		shutdown-gpios = <&gpio0 RK_PB1 GPIO_ACTIVE_HIGH>;
-+		max-speed = <1500000>;
-+		pinctrl-names = "default";
-+		pinctrl-0 = <&bt_host_wake &bt_wake &bt_reset>;
-+	};
-+	*/
-+
 +};
 +
 +&uart2 {
@@ -853,13 +842,6 @@ index 00000000000..e0490aaa7ba
 +		status = "okay";
 +	};
 +
-+	/*
-+	onewire_ts@2f {
-+		compatible = "onewire";
-+		reg = <0x2f>;
-+		interrupt-parent = <&gpio1>;
-+		interrupts = <20 IRQ_TYPE_EDGE_FALLING>;
-+	}; */
 +};
 +
 +&i2c7 {
@@ -983,7 +965,7 @@ index 00000000000..e0490aaa7ba
 +	disable-wp;
 +	max-frequency = <150000000>;
 +	pinctrl-names = "default";
-+	pinctrl-0 = <&sdmmc_bus4 &sdmmc_clk &sdmmc_cmd &sdmmc0_det_l>;
++	pinctrl-0 = <&sdmmc_bus4 &sdmmc_clk &sdmmc_cmd &sdmmc_cd>;
 +	sd-uhs-sdr104;
 +	vmmc-supply = <&vcc3v0_sd>;
 +	vqmmc-supply = <&vcc_sdio>;
@@ -1141,16 +1123,6 @@ index 00000000000..e0490aaa7ba
 +		};
 +	};
 +
-+	sdmmc {
-+		sdmmc0_det_l: sdmmc0-det-l {
-+			rockchip,pins = <0 RK_PA7 RK_FUNC_GPIO &pcfg_pull_up>;
-+		};
-+
-+		sdmmc0_pwr_h: sdmmc0-pwr-h {
-+			rockchip,pins = <0 RK_PA1 RK_FUNC_GPIO &pcfg_pull_up>;
-+		};
-+	};
-+
 +	usb-typec {
 +		vcc5v0_typec_en: vcc5v0_typec_en {
 +			rockchip,pins = <2 RK_PB4 RK_FUNC_GPIO &pcfg_pull_up>;
@@ -1262,3 +1234,89 @@ index 00000000000..e0490aaa7ba
 +	status = "okay";
 +};
 +
++&dmc {
++	#cooling-cells = <2>; /* min followed by max */
++
++	status = "okay";
++	center-supply = <&vdd_log>;
++	operating-points-v2 = <&dmc_opp_table>;
++
++	rockchip,pd-idle-ns = <160>;
++	rockchip,sr-idle-ns = <10240>;
++	rockchip,sr-mc-gate-idle-ns = <40960>;
++	rockchip,srpd-lite-idle-ns = <61440>;
++	rockchip,standby-idle-ns = <81920>;
++
++	rockchip,ddr3_odt_dis_freq = <666000000>;
++	rockchip,lpddr3_odt_dis_freq = <666000000>;
++	rockchip,lpddr4_odt_dis_freq = <666000000>;
++
++	rockchip,sr-mc-gate-idle-dis-freq-hz = <1000000000>;
++	rockchip,srpd-lite-idle-dis-freq-hz = <0>;
++	rockchip,standby-idle-dis-freq-hz = <928000000>;
++
++};
++
++&dfi {
++	status = "okay";
++};
++
++/*
++ * Redefine some parameters for the thermal trip points for Opi4 LTS.
++ * First of all, the Soc does not like getting over 90°C. My sample
++ * froze at 94.4°C, so we lower the critical temprature to 90°C, hopefully
++ * giving enough room for safe reboot of the device.
++ * Big cores are getting throttled a bit when reaching 82°C, then at 85°C
++ * we aggressively throttle all the cores and even the memory controller.
++ * The GPU is handled by existing trip points in the base device tree, here
++ * we just set the same critical temperature as CPU.
++ */
++&cpu_alert0 {
++	temperature = <82000>;
++};
++
++&cpu_alert1 {
++	temperature = <85000>;
++};
++
++&cpu_crit {
++	temperatue = <90000>;
++};
++
++&gpu_crit {
++	temperatue = <90000>;
++};
++
++&cpu_thermal {
++
++	cooling-maps {
++
++		map0 {
++			trip = <&cpu_alert0>;
++			cooling-device =
++				<&cpu_b0 THERMAL_NO_LIMIT 3>,
++				<&cpu_b1 THERMAL_NO_LIMIT 3>;
++		};
++
++		map1 {
++			trip = <&cpu_alert1>;
++			cooling-device =
++				<&cpu_l0 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>,
++				<&cpu_l1 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>,
++				<&cpu_l2 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>,
++				<&cpu_l3 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>,
++				<&cpu_b0 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>,
++				<&cpu_b1 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>;
++		};
++
++		map2 {
++			trip = <&cpu_alert1>;
++			cooling-device =
++				<&dmc THERMAL_NO_LIMIT THERMAL_NO_LIMIT>;
++		};
++
++	};
++
++};
+-- 
+2.34.1

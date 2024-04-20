@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
+#
+# SPDX-License-Identifier: GPL-2.0
+#
+# Copyright (c) 2013-2023 Igor Pecovnik, igor@armbian.com
+#
+# This file is a part of the Armbian Build Framework
+# https://github.com/armbian/build/
 
-SHELLFMT_VERSION=${SHELLFMT_VERSION:-3.5.1} # https://github.com/mvdan/sh/releases/
+SHELLFMT_VERSION=${SHELLFMT_VERSION:-3.6.0} # https://github.com/mvdan/sh/releases/
 
 SRC="$(
 	cd "$(dirname "$0")/../.."
@@ -31,7 +38,7 @@ case "$MACHINE" in
 esac
 
 SHELLFMT_FN="shfmt_v${SHELLFMT_VERSION}_${SHELLFMT_OS}_${SHELLFMT_ARCH}"
-DOWN_URL="https://github.com/mvdan/sh/releases/download/v${SHELLFMT_VERSION}/${SHELLFMT_FN}"
+DOWN_URL="${GITHUB_SOURCE:-"https://github.com"}/mvdan/sh/releases/download/v${SHELLFMT_VERSION}/${SHELLFMT_FN}"
 SHELLFMT_BIN="${DIR_SHELLFMT}/${SHELLFMT_FN}"
 
 echo "MACHINE: ${MACHINE}"
